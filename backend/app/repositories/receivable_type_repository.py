@@ -9,3 +9,10 @@ async def list_all(session: AsyncSession) -> list[ReceivableType]:
         select(ReceivableType).order_by(ReceivableType.name)
     )
     return list(result.scalars().all())
+
+
+async def get_by_name(session: AsyncSession, name: str) -> ReceivableType | None:
+    result = await session.execute(
+        select(ReceivableType).where(ReceivableType.name == name)
+    )
+    return result.scalar_one_or_none()
