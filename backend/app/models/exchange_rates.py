@@ -1,3 +1,4 @@
+import uuid
 from datetime import date
 from decimal import Decimal
 
@@ -10,10 +11,10 @@ from app.models.base import Base
 class ExchangeRate(Base):
     __tablename__ = "exchange_rates"
 
-    from_currency_id: Mapped[Decimal] = mapped_column(
+    from_currency_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("currencies.id"), nullable=False, index=True
     )
-    to_currency_id: Mapped[Decimal] = mapped_column(
+    to_currency_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("currencies.id"), nullable=False, index=True
     )
     rate: Mapped[Decimal] = mapped_column(Numeric(20, 8), nullable=False)
