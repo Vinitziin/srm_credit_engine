@@ -16,4 +16,3 @@ router.include_router(cedentes_router)
 router.include_router(simulate_router)
 router.include_router(transactions_router)
 router.include_router(reports_router)
-

@@ -17,5 +17,5 @@ class PricingStrategy(ABC):
         self, face_value: Decimal, base_rate: Decimal, term_months: int
     ) -> Decimal:
         rate = Decimal(1) + base_rate + self.get_spread()
-        pv = face_value / rate ** term_months
+        pv = face_value / rate**term_months
         return pv.quantize(Decimal("0.00000001"))

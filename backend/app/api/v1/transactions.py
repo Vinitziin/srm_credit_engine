@@ -1,5 +1,6 @@
 import uuid
 
+import structlog
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import StaleDataError
@@ -18,6 +19,8 @@ from app.schemas.transactions import (
 )
 from app.services.pricing_service import price_receivable
 
+logger = structlog.get_logger()
+
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
 
 
@@ -34,18 +37,14 @@ async def create_transaction(
             detail=f"Cedente {data.cedente_id} not found",
         )
 
-    receivable_type = await receivable_type_repository.get_by_name(
-        session, data.receivable_type
-    )
+    receivable_type = await receivable_type_repository.get_by_name(session, data.receivable_type)
     if receivable_type is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Receivable type '{data.receivable_type}' not found",
         )
 
-    currency = await currency_repository.get_by_code(
-        session, data.currency_code.upper()
-    )
+    currency = await currency_repository.get_by_code(session, data.currency_code.upper())
     payment_currency = await currency_repository.get_by_code(
         session, data.payment_currency_code.upper()
     )
@@ -79,6 +78,16 @@ async def create_transaction(
         spread_applied=pricing.spread_applied,
     )
     await session.commit()
+    logger.info(
+        "transaction.created",
+        transaction_id=str(transaction.id),
+        cedente_id=str(cedente.id),
+        face_value=str(data.face_value),
+        present_value=str(pricing.present_value_in_payment_currency),
+        currency=data.currency_code.upper(),
+        payment_currency=data.payment_currency_code.upper(),
+        cross_currency=data.currency_code.upper() != data.payment_currency_code.upper(),
+    )
     return transaction
 
 
@@ -113,11 +122,10 @@ async def update_transaction_status(
     if transaction.version != data.version:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=(
-                f"Version mismatch: expected {transaction.version}, got {data.version}"
-            ),
+            detail=(f"Version mismatch: expected {transaction.version}, got {data.version}"),
         )
 
+    previous_status = transaction.status
     transaction.status = data.status
     try:
         await session.commit()
@@ -128,4 +136,11 @@ async def update_transaction_status(
             detail="Transaction was modified by another process",
         ) from exc
     await session.refresh(transaction)
+    logger.info(
+        "transaction.status_changed",
+        transaction_id=str(transaction.id),
+        from_status=previous_status,
+        to_status=transaction.status,
+        new_version=transaction.version,
+    )
     return transaction

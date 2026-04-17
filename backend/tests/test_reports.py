@@ -2,9 +2,7 @@ import pytest
 
 
 async def _create_cedente(client, name, document) -> str:
-    resp = await client.post(
-        "/api/v1/cedentes", json={"name": name, "document": document}
-    )
+    resp = await client.post("/api/v1/cedentes", json={"name": name, "document": document})
     assert resp.status_code == 201
     return resp.json()["id"]
 
@@ -61,15 +59,9 @@ async def test_statements_pagination(client):
     for _ in range(5):
         await _create_tx(client, cid)
 
-    page1 = await client.get(
-        "/api/v1/reports/statements", params={"page": 1, "page_size": 2}
-    )
-    page2 = await client.get(
-        "/api/v1/reports/statements", params={"page": 2, "page_size": 2}
-    )
-    page3 = await client.get(
-        "/api/v1/reports/statements", params={"page": 3, "page_size": 2}
-    )
+    page1 = await client.get("/api/v1/reports/statements", params={"page": 1, "page_size": 2})
+    page2 = await client.get("/api/v1/reports/statements", params={"page": 2, "page_size": 2})
+    page3 = await client.get("/api/v1/reports/statements", params={"page": 3, "page_size": 2})
 
     assert page1.json()["total"] == 5
     assert len(page1.json()["items"]) == 2
@@ -92,9 +84,7 @@ async def test_statements_filter_by_cedente(client):
     await _create_tx(client, cid_a)
     await _create_tx(client, cid_b)
 
-    resp = await client.get(
-        "/api/v1/reports/statements", params={"cedente_id": cid_a}
-    )
+    resp = await client.get("/api/v1/reports/statements", params={"cedente_id": cid_a})
     body = resp.json()
     assert body["total"] == 2
     assert all(item["cedente_name"] == "A" for item in body["items"])
@@ -108,14 +98,10 @@ async def test_statements_filter_by_payment_currency(client):
     # cross-currency USD->BRL (seeded rate exists)
     await _create_tx(client, cid, currency="USD", payment_currency="BRL")
 
-    resp_brl = await client.get(
-        "/api/v1/reports/statements", params={"currency_code": "BRL"}
-    )
+    resp_brl = await client.get("/api/v1/reports/statements", params={"currency_code": "BRL"})
     assert resp_brl.json()["total"] == 2
 
-    resp_usd = await client.get(
-        "/api/v1/reports/statements", params={"currency_code": "USD"}
-    )
+    resp_usd = await client.get("/api/v1/reports/statements", params={"currency_code": "USD"})
     assert resp_usd.json()["total"] == 0
 
 
@@ -132,12 +118,8 @@ async def test_statements_filter_by_status(client):
     )
     assert patch.status_code == 200
 
-    settled = await client.get(
-        "/api/v1/reports/statements", params={"status": "SETTLED"}
-    )
-    reversed_ = await client.get(
-        "/api/v1/reports/statements", params={"status": "REVERSED"}
-    )
+    settled = await client.get("/api/v1/reports/statements", params={"status": "SETTLED"})
+    reversed_ = await client.get("/api/v1/reports/statements", params={"status": "REVERSED"})
     assert settled.json()["total"] == 1
     assert reversed_.json()["total"] == 1
 
@@ -180,15 +162,11 @@ async def test_statements_filter_by_date_range(client):
 
 @pytest.mark.asyncio
 async def test_statements_invalid_currency_code_returns_422(client):
-    resp = await client.get(
-        "/api/v1/reports/statements", params={"currency_code": "EURO"}
-    )
+    resp = await client.get("/api/v1/reports/statements", params={"currency_code": "EURO"})
     assert resp.status_code == 422
 
 
 @pytest.mark.asyncio
 async def test_statements_page_size_upper_bound(client):
-    resp = await client.get(
-        "/api/v1/reports/statements", params={"page_size": 500}
-    )
+    resp = await client.get("/api/v1/reports/statements", params={"page_size": 500})
     assert resp.status_code == 422

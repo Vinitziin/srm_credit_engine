@@ -16,9 +16,7 @@ class ExternalRateError(Exception):
     """Raised when the external exchange rate API call fails."""
 
 
-async def fetch_external_rate(
-    from_code: str, to_code: str, max_retries: int = 3
-) -> Decimal:
+async def fetch_external_rate(from_code: str, to_code: str, max_retries: int = 3) -> Decimal:
     """Fetches exchange rate from a mocked external API with simple retry."""
     for attempt in range(1, max_retries + 1):
         try:
@@ -50,14 +48,10 @@ async def _call_external_api(from_code: str, to_code: str) -> Decimal:
     await asyncio.sleep(0.1)
 
     if random.random() < 0.2:  # noqa: S311
-        raise ExternalRateError(
-            f"External API unavailable for {from_code}/{to_code}"
-        )
+        raise ExternalRateError(f"External API unavailable for {from_code}/{to_code}")
 
     rate = MOCK_RATES.get((from_code, to_code))
     if rate is None:
-        raise ExternalRateError(
-            f"No rate available for {from_code}/{to_code}"
-        )
+        raise ExternalRateError(f"No rate available for {from_code}/{to_code}")
 
     return rate

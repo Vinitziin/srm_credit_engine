@@ -25,15 +25,11 @@ class Transaction(Base):
     payment_currency_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("currencies.id"), nullable=False, index=True
     )
-    exchange_rate_used: Mapped[Decimal | None] = mapped_column(
-        Numeric(20, 8), nullable=True
-    )
+    exchange_rate_used: Mapped[Decimal | None] = mapped_column(Numeric(20, 8), nullable=True)
     term_months: Mapped[int] = mapped_column(Integer, nullable=False)
     base_rate: Mapped[Decimal] = mapped_column(Numeric(10, 6), nullable=False)
     spread_applied: Mapped[Decimal] = mapped_column(Numeric(10, 6), nullable=False)
-    status: Mapped[str] = mapped_column(
-        String(20), nullable=False, default="SETTLED"
-    )
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="SETTLED")
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     created_at: Mapped[datetime] = mapped_column(
         nullable=False, server_default=func.now(), index=True

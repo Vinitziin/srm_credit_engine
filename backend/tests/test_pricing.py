@@ -21,9 +21,7 @@ class TestDuplicataStrategy:
             base_rate=Decimal("0.01"),
             term_months=12,
         )
-        expected = (Decimal("10000") / Decimal("1.025") ** 12).quantize(
-            Decimal("0.00000001")
-        )
+        expected = (Decimal("10000") / Decimal("1.025") ** 12).quantize(Decimal("0.00000001"))
         assert pv == expected
 
     def test_present_value_1_month(self):
@@ -33,9 +31,7 @@ class TestDuplicataStrategy:
             base_rate=Decimal("0.01"),
             term_months=1,
         )
-        expected = (Decimal("1000") / Decimal("1.025")).quantize(
-            Decimal("0.00000001")
-        )
+        expected = (Decimal("1000") / Decimal("1.025")).quantize(Decimal("0.00000001"))
         assert pv == expected
 
     def test_present_value_zero_term(self):
@@ -62,9 +58,7 @@ class TestChequeStrategy:
             base_rate=Decimal("0.02"),
             term_months=6,
         )
-        expected = (Decimal("5000") / Decimal("1.045") ** 6).quantize(
-            Decimal("0.00000001")
-        )
+        expected = (Decimal("5000") / Decimal("1.045") ** 6).quantize(Decimal("0.00000001"))
         assert pv == expected
 
     def test_higher_spread_means_lower_pv(self):

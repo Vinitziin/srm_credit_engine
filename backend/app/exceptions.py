@@ -25,9 +25,7 @@ async def stale_data_handler(_request: Request, exc: StaleDataError) -> JSONResp
     )
 
 
-async def integrity_error_handler(
-    _request: Request, exc: IntegrityError
-) -> JSONResponse:
+async def integrity_error_handler(_request: Request, exc: IntegrityError) -> JSONResponse:
     # Only unique-constraint violations map cleanly to 409; everything else is a 500.
     pgcode = getattr(getattr(exc, "orig", None), "pgcode", None)
     if pgcode == _PG_UNIQUE_VIOLATION:

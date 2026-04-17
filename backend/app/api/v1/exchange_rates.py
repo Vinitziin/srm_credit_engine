@@ -54,9 +54,7 @@ async def get_latest_rate(
     return _build_response(exchange_rate, from_code, to_code)
 
 
-@router.post(
-    "", response_model=ExchangeRateResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("", response_model=ExchangeRateResponse, status_code=status.HTTP_201_CREATED)
 async def create_exchange_rate(
     data: ExchangeRateCreate,
     session: AsyncSession = Depends(get_session),
@@ -68,9 +66,7 @@ async def create_exchange_rate(
         session, from_curr.id, to_curr.id, data.rate
     )
     await session.commit()
-    return _build_response(
-        exchange_rate, from_curr.code, to_curr.code
-    )
+    return _build_response(exchange_rate, from_curr.code, to_curr.code)
 
 
 @router.post(
@@ -89,8 +85,6 @@ async def fetch_external_rate(
 
     from_curr, to_curr = await _resolve_currencies(session, from_code, to_code)
     rate = await exchange_rate_client.fetch_external_rate(from_code, to_code)
-    exchange_rate = await exchange_rate_repository.create(
-        session, from_curr.id, to_curr.id, rate
-    )
+    exchange_rate = await exchange_rate_repository.create(session, from_curr.id, to_curr.id, rate)
     await session.commit()
     return _build_response(exchange_rate, from_code, to_code)

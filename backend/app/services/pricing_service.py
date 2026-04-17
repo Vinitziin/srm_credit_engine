@@ -36,9 +36,7 @@ async def price_receivable(
     try:
         strategy = get_strategy(receivable_type)
     except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
-        ) from exc
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
     pv = strategy.calculate_present_value(face_value, base_rate, term_months)
 

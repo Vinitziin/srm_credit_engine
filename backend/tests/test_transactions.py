@@ -2,9 +2,7 @@ import pytest
 
 
 async def _create_cedente(client, document="11111111000111") -> str:
-    resp = await client.post(
-        "/api/v1/cedentes", json={"name": "Test SA", "document": document}
-    )
+    resp = await client.post("/api/v1/cedentes", json={"name": "Test SA", "document": document})
     assert resp.status_code == 201
     return resp.json()["id"]
 
@@ -43,9 +41,7 @@ async def test_post_transaction_cross_currency_uses_fx(client):
     cedente_id = await _create_cedente(client)
     resp = await client.post(
         "/api/v1/transactions",
-        json=_tx_payload(
-            cedente_id, currency_code="USD", payment_currency_code="BRL"
-        ),
+        json=_tx_payload(cedente_id, currency_code="USD", payment_currency_code="BRL"),
     )
     assert resp.status_code == 201
     body = resp.json()
