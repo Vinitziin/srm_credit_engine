@@ -1,12 +1,39 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Layout } from "./components/Layout";
+import { CedentesPage } from "./pages/CedentesPage";
+import { SimulatorPage } from "./pages/SimulatorPage";
+import { StatementsPage } from "./pages/StatementsPage";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { refetchOnWindowFocus: false, retry: 1 },
+  },
+});
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      { index: true, element: <SimulatorPage /> },
+      { path: "statements", element: <StatementsPage /> },
+      { path: "cedentes", element: <CedentesPage /> },
+    ],
+  },
+]);
+
 export function App() {
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-white mb-2">
-          SRM Credit Engine
-        </h1>
-        <p className="text-gray-400">Motor de Cessão de Crédito Multimoedas</p>
-      </div>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: { background: "#1f2937", color: "#f3f4f6" },
+        }}
+      />
+    </QueryClientProvider>
   );
 }
