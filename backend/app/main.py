@@ -14,6 +14,10 @@ app.add_middleware(RequestIdMiddleware)
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
 
+from app.api.v1 import router as v1_router  # noqa: E402
+
+app.include_router(v1_router)
+
 
 @app.get("/health")
 async def health_check() -> dict[str, str]:

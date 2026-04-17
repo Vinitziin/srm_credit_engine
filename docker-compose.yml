@@ -26,6 +26,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://srm:srm_secret@db:5432/srm_credit
     volumes:
       - ./backend/app:/app/app
+      - ./backend/alembic:/app/alembic
 
   frontend:
     build: ./frontend
