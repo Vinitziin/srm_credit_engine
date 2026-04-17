@@ -1,2 +1,26 @@
-# Full configuration in Phase 8 (feature/observability)
-repos: []
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-merge-conflict
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^backend/
+      - id: ruff-format
+        files: ^backend/
+
+  - repo: local
+    hooks:
+      - id: frontend-tsc
+        name: frontend tsc
+        language: system
+        entry: bash -c 'cd frontend && npx tsc -b'
+        pass_filenames: false
+        files: ^frontend/(src/|tsconfig).*\.(ts|tsx|json)$
