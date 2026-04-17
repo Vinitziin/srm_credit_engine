@@ -1,9 +1,12 @@
+import structlog
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
 from app.schemas.simulate import SimulateRequest, SimulateResponse
 from app.services.pricing_service import price_receivable
+
+logger = structlog.get_logger()
 
 router = APIRouter(tags=["Simulation"])
 
@@ -22,6 +25,16 @@ async def simulate(
         receivable_type=data.receivable_type,
         currency_code=data.currency_code,
         payment_currency_code=data.payment_currency_code,
+    )
+
+    logger.debug(
+        "simulation.computed",
+        face_value=str(data.face_value),
+        spread=str(result.spread_applied),
+        present_value=str(result.present_value),
+        cross_currency=(
+            data.currency_code.upper() != data.payment_currency_code.upper()
+        ),
     )
 
     return SimulateResponse(
