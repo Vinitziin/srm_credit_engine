@@ -11,7 +11,7 @@ from app.exceptions import (
     stale_data_handler,
     unhandled_exception_handler,
 )
-from app.logging import RequestIdMiddleware, setup_logging
+from app.logging import AccessLogMiddleware, RequestIdMiddleware, setup_logging
 
 settings = get_settings()
 setup_logging(settings.LOG_LEVEL)
@@ -25,6 +25,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(AccessLogMiddleware)
 app.add_middleware(RequestIdMiddleware)
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(StaleDataError, stale_data_handler)

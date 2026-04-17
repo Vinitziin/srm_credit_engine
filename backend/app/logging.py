@@ -1,10 +1,14 @@
 import logging
+import time
 import uuid
 
 import structlog
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
+
+_ACCESS_LOG_SKIP_PATHS = {"/health"}
+_access_logger = structlog.get_logger("access")
 
 
 def setup_logging(log_level: str = "INFO") -> None:
@@ -37,4 +41,26 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
 
         response = await call_next(request)
         response.headers["X-Request-ID"] = request_id
+        return response
+
+
+class AccessLogMiddleware(BaseHTTPMiddleware):
+    """Emits a structured access log per request with latency in milliseconds."""
+
+    async def dispatch(
+        self, request: Request, call_next: RequestResponseEndpoint
+    ) -> Response:
+        if request.url.path in _ACCESS_LOG_SKIP_PATHS:
+            return await call_next(request)
+
+        start = time.perf_counter()
+        response = await call_next(request)
+        duration_ms = round((time.perf_counter() - start) * 1000, 2)
+        _access_logger.info(
+            "http_request",
+            method=request.method,
+            path=request.url.path,
+            status_code=response.status_code,
+            duration_ms=duration_ms,
+        )
         return response
