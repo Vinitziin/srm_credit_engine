@@ -24,8 +24,6 @@ async def create_cedente(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Cedente with document {data.document} already exists",
         )
-    cedente = await cedente_repository.create(
-        session, name=data.name, document=data.document
-    )
+    cedente = await cedente_repository.create(session, name=data.name, document=data.document)
     await session.commit()
     return cedente

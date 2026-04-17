@@ -32,9 +32,7 @@ async def simulate(
         face_value=str(data.face_value),
         spread=str(result.spread_applied),
         present_value=str(result.present_value),
-        cross_currency=(
-            data.currency_code.upper() != data.payment_currency_code.upper()
-        ),
+        cross_currency=(data.currency_code.upper() != data.payment_currency_code.upper()),
     )
 
     return SimulateResponse(

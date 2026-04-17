@@ -6,8 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import StaleDataError
 
 from app.database import get_session
-
-logger = structlog.get_logger()
 from app.repositories import (
     cedente_repository,
     currency_repository,
@@ -20,6 +18,8 @@ from app.schemas.transactions import (
     TransactionStatusUpdate,
 )
 from app.services.pricing_service import price_receivable
+
+logger = structlog.get_logger()
 
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
 
@@ -37,18 +37,14 @@ async def create_transaction(
             detail=f"Cedente {data.cedente_id} not found",
         )
 
-    receivable_type = await receivable_type_repository.get_by_name(
-        session, data.receivable_type
-    )
+    receivable_type = await receivable_type_repository.get_by_name(session, data.receivable_type)
     if receivable_type is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Receivable type '{data.receivable_type}' not found",
         )
 
-    currency = await currency_repository.get_by_code(
-        session, data.currency_code.upper()
-    )
+    currency = await currency_repository.get_by_code(session, data.currency_code.upper())
     payment_currency = await currency_repository.get_by_code(
         session, data.payment_currency_code.upper()
     )
@@ -126,9 +122,7 @@ async def update_transaction_status(
     if transaction.version != data.version:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=(
-                f"Version mismatch: expected {transaction.version}, got {data.version}"
-            ),
+            detail=(f"Version mismatch: expected {transaction.version}, got {data.version}"),
         )
 
     previous_status = transaction.status

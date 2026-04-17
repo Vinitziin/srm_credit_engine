@@ -7,6 +7,7 @@ clause is shared between the COUNT and the paginated SELECT.
 Never interpolate filter values into the SQL string: every dynamic piece is a
 named bindparam to keep this injection-free.
 """
+
 from datetime import timedelta
 
 from sqlalchemy import text

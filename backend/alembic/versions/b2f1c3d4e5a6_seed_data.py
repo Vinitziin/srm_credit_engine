@@ -5,14 +5,15 @@ Revises: a74fd0848ea6
 Create Date: 2026-04-17 05:10:00.000000
 
 """
+
 import uuid
 from datetime import date
 from decimal import Decimal
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "b2f1c3d4e5a6"

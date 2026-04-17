@@ -9,6 +9,7 @@ connections cannot cross event loops. The `_reset_engine` autouse fixture
 disposes the module-level engine before every test so the next awaited
 operation opens a fresh connection bound to the current loop.
 """
+
 from collections.abc import AsyncGenerator
 
 import pytest_asyncio

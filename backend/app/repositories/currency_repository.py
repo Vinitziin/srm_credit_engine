@@ -10,7 +10,5 @@ async def list_all(session: AsyncSession) -> list[Currency]:
 
 
 async def get_by_code(session: AsyncSession, code: str) -> Currency | None:
-    result = await session.execute(
-        select(Currency).where(Currency.code == code)
-    )
+    result = await session.execute(select(Currency).where(Currency.code == code))
     return result.scalar_one_or_none()
